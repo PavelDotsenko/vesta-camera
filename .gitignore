@@ -7,3 +7,4 @@ web-x.cramfs.img
 web.zip
 web/css
 web/js
+node_modules
