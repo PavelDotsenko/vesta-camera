@@ -1,0 +1,1557 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>MegaCam</title>
+
+    <!-- m.js -->
+    <link rel="stylesheet" type="text/css" media="screen" href="css/main.css" />
+
+    <script src="js/scripts.js"></script>
+
+    <script type="text/javascript" language="JavaScript">
+        if(navigator.userAgent.indexOf('IE') < 0) {
+            var userAgent    = navigator.userAgent,   
+                rMsie        = /(msie\s|trident.*rv:)([\w.]+)/,
+                rFirefox     = /(firefox)\/([\w.]+)/,   
+                rOpera       = /(opera).+version\/([\w.]+)/,   
+                rChrome      = /(chrome)\/([\w.]+)/,   
+                rSafari      = /version\/([\w.]+).*(safari)/,
+                browserMatch = uaMatch(userAgent.toLowerCase());
+            
+            // if(browserMatch.browser!="IE") location="Login.htm";
+        }
+	
+        function reminder() {
+            var nSel=$('langlist').selectedIndex,
+                cLanguage;
+
+            switch(nSel) {
+                case 0:
+                    cLanguage="English";
+                    break;
+                case 1:
+                    cLanguage="Russian";
+                    break;
+                default:
+                    cLanguage="English";
+                    break;   
+            }
+        }
+	
+        function uaMatch(ua) {  
+            var match = rMsie.exec(ua);
+    
+            if (match != null) return { browser : "IE", version : match[2] || "0" };  
+
+            var match = rFirefox.exec(ua);  
+
+            if (match != null) return { browser : match[1] || "", version : match[2] || "0" };
+
+            var match = rOpera.exec(ua);
+
+            if (match != null) return { browser : match[1] || "", version : match[2] || "0" };
+
+            var match = rChrome.exec(ua);  
+
+            if (match != null) return { browser : match[1] || "", version : match[2] || "0" };  
+
+            var match = rSafari.exec(ua);
+
+            if (match != null) return { browser : match[2] || "", version : match[1] || "0" }; 
+            if (match != null) return { browser : "", version : "0" };
+        }  
+    </script>
+
+    <script type="text/javascript">//m.js
+        var ipaddress =document.location.hostname;
+
+        if (ipaddress == "") {
+            ipaddress = "10.10.33.175";
+            //ipaddress = "10.10.35.107";
+        }
+
+        var hostport=34567,
+            iLanguage=100,
+            numLanguage,
+            DownLoadAddr="";
+    </script>
+    
+	<script type="text/javascript" src="js/m.jsp"></script>
+	<script type="text/javascript" src="js/config.js"></script>
+
+    <!-- 全局变量 -->
+
+    <script type="text/javascript">
+        var gExitChannel=new Array(),
+            gExitSubType=new Array(),
+            gexiti,
+            gcid=-1,
+            g_channelNum=4,
+            g_digitalChannel=0,
+            gsld,
+            gslda,
+            gsldb,
+            gsldc,
+            gsldd,
+            gfmu1=0,
+            gfmu2=0,
+            gfmu3=0,
+            g_bRecord=false,
+            g_bRealPlay=false,
+            g_bAudio=false,
+            g_bQS=false,
+            g_bSubQS1=true,
+            g_bSubQS2=true,
+            g_bSubQS3=true,
+            g_bSubQS4=false,
+            g_strSubQS4Name = '',
+            g_bClose=false,
+            gHashCookie = new Hash.Cookie('NetSuveillanceWebCookie',{duration: 30}),
+            settings = {
+                username:'',
+                ocxlanguage:''
+        	}
+            gca=0,
+            gcb=0,
+            gcc=0,
+            gcd=0,
+            gAutoPlayAll=false;
+    </script>
+
+    <!-- 颜色滑块 -->
+
+    <script type="text/javascript">
+        function sldtopos(sld,step){ sld.knob.setStyle('left', sld.toPosition(step)) }
+
+        function setcolorsv(f,v){
+            switch (f) {
+                case 1: gca=v;
+                    $('ska').title=v;
+                    break;
+                case 2: gcb=v;
+                    $('skb').title=v;
+                    break;
+                case 3: gcc=v;
+                    $('skc').title=v;
+                    break;
+                case 4: gcd=v;
+                    $('skd').title=v;
+                    break;
+            }	
+        }
+
+        function getcolors() {
+            var colors="";
+            
+            colors=ocx.GetColor();
+            
+            var t= new Array();
+            
+            if (colors !="") {
+                t=colors.split(',');
+                sldtopos(gslda,parseInt(t[0]));
+                sldtopos(gsldb,parseInt(t[1]));
+                sldtopos(gsldc,parseInt(t[2]));
+                sldtopos(gsldd,parseInt(t[3]));
+                setcolorsv(1,parseInt(t[0]));
+                setcolorsv(2,parseInt(t[1]));
+                setcolorsv(3,parseInt(t[2]));
+                setcolorsv(4,parseInt(t[3]));
+            }
+            else { // 这里有待选中消息的传递
+                sldtopos(gslda,parseInt(0));
+                sldtopos(gsldb,parseInt(0));
+                sldtopos(gsldc,parseInt(0));
+                sldtopos(gsldd,parseInt(0));
+                setcolorsv(1,parseInt(0));
+                setcolorsv(2,parseInt(0));
+                setcolorsv(3,parseInt(0));
+                setcolorsv(4,parseInt(0));	
+            }
+        }
+
+        function txreset(step) {
+            setcolorsv(1,step);
+            setcolorsv(2,step);
+            setcolorsv(3,step);
+            setcolorsv(4,step);
+            sldtopos(gslda,step);
+            sldtopos(gsldb,step);
+            sldtopos(gsldc,step);
+            sldtopos(gsldd,step);
+            setcolors();
+        }
+
+        function setcolors(){ ocx.SetColor(0,gca,gcb,gcc,gcd) }
+    </script>
+
+    <!-- 设备通道  -->
+
+    <script type="text/javascript">
+        function tl(s) {
+            var ret;
+            
+            ret=ocx.Translate(s);
+            return ret;
+        }//moving here for later function 
+
+        function ca(o,ch) {
+            var oc;
+
+            if ($(o).hasClass('cl1')) {
+                if (ocx.StartRealPlay(ch,0,0)) {
+                    oc=$('c'+ch);
+                    oc.removeClass(oc.className);
+                    oc.addClass('cl2');   
+                }
+            }
+            else {
+                if (ocx.StopPlayReal(ch)) {
+                    oc=$('c'+ch);
+                    oc.removeClass(oc.className);
+                    oc.addClass('cl1');
+                }
+            }
+        }
+
+        function getcl() {	
+            g_digitalChannel=ocx.GetDeviceState(1,0);
+
+            var t= new Array(),
+                ts=new Array(),
+                titles=new Array();
+            
+            titles[0]=tl('Desktop.LocalRecord');
+            titles[1]=tl('Desktop.ExtStream');
+            titles[2]=tl('Desktop.MainStream');
+            titles[3]=tl('Desktop.StartTalk');
+            titles[4]=tl('WebTitle.DigitalChannel');
+            
+            var shtml="";
+
+            shtml+="<li id='Talk' style='display: none !important' ><a title='"+titles[3]+"' id='talking' class='noT' href='javascript:;'  onclick='Ontalk()' ></a><span id='logoString' style='margin:0 5px 0 3px;'>NetSurveillance</span></li> "
+            
+            var strsplita=String.fromCharCode(16),
+                strsplitb=String.fromCharCode(9),
+                sc;
+
+            sc=ocx.GetChannelName();	
+
+            if (sc !="") {
+                sc=sc.substr(0, sc.length-1);
+                t=sc.split(strsplita);
+                g_channelNum=t.length;
+                
+                var htmlReg = /<(\w+)>/;
+                
+                for (var i =0; i<t.length;i++ ) {
+                    ts=t[i].split(strsplitb);
+                    ts[1].replace(htmlReg, "&lt;$1&gt;");  //替换html字符
+        // 			if(i>=(g_channelNum-g_digitalChannel)) {
+        // 			    shtml+="<li  ><a title='"+titles[0]+"' id='re" + ts[0] + "' class='noRecord' href='javascript:;' onclick='record(this," + ts[0] 
+        // 		                      + ")'></a><a title='"+titles[4]+"' id='c" + ts[0] + "' class='cl1' onclick='ca(this," + ts[0] +")' ></a><span id='name"+ts[0]+"'  style='position:absolute;margin:3px 0 0 0;'>" + ts[1] + "</span></li>" //<span style='filter:;'> 		
+        // 			}
+        // 			else
+                    {
+                        shtml +="<a title='"+titles[0]+"' id='re" + ts[0] + "' class='noRecord' href='javascript:;' onclick='record(this," + ts[0] 
+                                + ")'></a><a title='"+titles[1]+"' id='subPlay" + ts[0] + "' class='noSubPlay' href='javascript:;' onclick='subPlay(this," + ts[0] 
+                                + ")'></a><a title='"+titles[2]+"' id='c" + ts[0] + "' class='cl1' onclick='ca(this," + ts[0] +")' ></a>" //<span style='filter:;'>
+                    }
+                }
+
+                $("pc").innerHTML +=shtml;
+
+                var ls = $('#pc');
+            }
+            //m_ocx.ChangeShowWndNum();
+            showExit();
+            showSelectNumb();
+            $('logoString').setText(logoString);//
+        }
+
+        function showSelectNumb() {
+            switch(g_channelNum) {
+                case 1: {
+                    $('xp2').style.display="none" ;
+                    $('xp3').style.display="none" ;
+                    $('xp4').style.display="none" ;
+                    $('xp5').style.display="none" ;
+                    $('xp6').style.display="none" ; 
+                    $('xp7').style.display="none" ;                                      
+                    break;                
+                }
+                case 2:
+                case 3:
+                case 4: {
+                    $('xp3').style.display="none" ;
+                    $('xp4').style.display="none" ;
+                    $('xp5').style.display="none" ;
+                    $('xp6').style.display="none" ; 
+                    $('xp7').style.display="none" ;     
+                    break;                
+                }
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9: {
+                    $('xp4').style.display="none" ;
+                    $('xp5').style.display="none" ;
+                    $('xp6').style.display="none" ;
+                    $('xp7').style.display="none" ;      
+                    break;                
+                }                
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16: {
+                    $('xp5').style.display="none" ;
+                    $('xp6').style.display="none" ;
+                    $('xp7').style.display="none" ;      
+                    break;                
+                }
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25: {
+                    $('xp6').style.display="none" ;   
+                    $('xp7').style.display="none" ;   
+                    break;                
+                }
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32: {
+                    $('xp7').style.display="none" ; 
+                    break;                
+                }
+                default: break;
+            }    
+        }
+
+        function showExit() {
+            for(var j=1;j<gexiti+1;j++) {     
+                if(gExitSubType[j]==true) {
+                        var temp="subPlay"+gExitChannel[j].toString(); 
+
+                        $(temp).removeClass($(temp).className);
+                        $(temp).addClass('subPlay');            
+                }
+                else {
+                    var temp="c"+gExitChannel[j].toString();
+
+                    $(temp).removeClass($(temp).className);
+                    $(temp).addClass('cl2');
+                }
+            }
+            gexiti=0;
+        }
+    </script>
+
+    <!-- 调整页面大小（待处理） -->
+
+    <script>
+        var g_Radio=1.25;//1.78
+
+        function  ChangeRadio() {
+            if(g_Radio==1.25) g_Radio=1.78;
+            else g_Radio=1.25;
+        }
+    </script>
+
+    <!-- 登入和翻译（待整理） -->
+	
+    <script>
+        function ld() {
+            gexiti=0;
+            gExitChannel[0]=0;
+            gExitSubType[0]=true;
+
+            var username = $("username").value,
+                password = $("password").value,
+                ocxlanguage=$("langlist").selectedIndex+1,
+                r=ocx.Login(ipaddress,hostport,username,password);
+            
+            if (r==-11700) {
+                location="err.htm";
+            }
+            
+            if (r>0) {
+                getcl();
+                timeup(2);
+
+                $('password').value="";
+                document.querySelector('#m').style.top = '0px'
+                $('login').style.display="none";
+                
+                settings['username'] = username;
+                settings['ocxlanguage'] = ocxlanguage;
+
+                
+                savesetting();
+                
+                if(gAutoPlayAll) ocx.PlayAll();
+                
+                g_bClose=false;
+            }
+        }
+
+        function timeup(sec) {
+            sec--;
+
+            if (sec == 0) {
+                var shtml="";
+                    shtml+="<div id='QSLogo'  style='text-align:center;width:90px;height:90px;background:url(c:/1.bmp);'></div>"
+                    shtml+="<div id='QSText1'  style='text-align:center'><span id='QSText' style='color:#000;'></span></div>"
+                    shtml+="<div id='QSLogo2' style='text-align:center;width:90px;height:90px;background:url(c:/2.bmp);'></div>"
+                    shtml+="<div id='QSText2' style='text-align:center'><span id='QSText21' style='color:#000;'></span></span></div>"
+                    shtml+="<div id='QSLogo3' style='text-align:center;width:90px;height:90px;background:url(c:/3.bmp);'></div>"
+                    shtml+="<div id='QSText3' style='text-align:center'><span style='color:#000;'>IOS</span></div>"
+                    shtml+="<div id='QSLogo4' style='text-align:center;width:90px;height:90px;background:url(c:/4.bmp);'></div>"
+                    shtml+="<div id='QSText4' style='text-align:center'><span id='QSText42' style='color:#000;'>Other</span></div>"
+                    
+                $("QQ").innerHTML=shtml;
+                $('QSLogo').title=tl('DeviceManage.SerialID');
+                $('QSText').setText(tl('DeviceManage.SerialID'));
+                $('QSLogo2').title=tl('DeviceManage.Android');
+                $('QSLogo3').title=tl('DeviceManage.IOS');
+                $('QSLogo4').title= g_strSubQS4Name;
+                $('QSText42').setText(g_strSubQS4Name);
+                
+                if(!g_bSubQS1) $('QSText1').style.display='none'
+
+                if(!g_bSubQS2) {
+                    $('QSLogo2').style.display='none'
+                    $('QSText2').style.display='none'
+                }
+
+                if(!g_bSubQS3) {
+                    $('QSLogo3').style.display='none'
+                    $('QSText3').style.display='none'
+                    $('QSLogo2').title=tl('DeviceManage.APP')
+                    $('QSText21').setText(tl('DeviceManage.APP'))
+                }
+                else $('QSText21').setText(tl('DeviceManage.Android'))
+
+                if(!g_bSubQS4) {
+                    $('QSLogo4').style.display='none'
+                    $('QSText4').style.display='none'
+                }
+                //$('QS').style.display='';
+            }
+            else {setTimeout("timeup("+sec+")", 1000);}
+        }
+
+        function DownLoadLo() { window.open('http://xmsecu.com:8080/ocx/NewActive.exe') }
+
+        function savesetting() { gHashCookie.extend(settings) }
+
+        function getsetting() {
+            if (gHashCookie.get('username')) settings['username'] = gHashCookie.get('username');
+            else settings['username'] = '';
+
+            if (gHashCookie.get('ocxlanguage')) {
+                settings['ocxlanguage'] = gHashCookie.get('ocxlanguage');
+
+                var cLanguage;
+
+                switch(settings['ocxlanguage']) {
+                    case 1:
+                            cLanguage="English";
+                            break;
+                    case 2:
+                            cLanguage="Russian";
+                            break;
+                    default:
+                            cLanguage="English";
+                            break;       
+                }
+
+                ocx.SetSpecialParamEx2(2,cLanguage,0,0);
+                inilanguage();
+            }
+            else { settings['ocxlanguage'] = numLanguage+1 }
+            
+            $('username').setProperty('value', settings['username']); 
+            $('langlist').selectedIndex=settings['ocxlanguage']-1;
+        }
+
+        function inilanguage(){
+            $('DVRcolor').setText(tl('Title.ImageConfig'));
+            $('xbc').setText(tl('WebPtz.Step')+'(1-8):');
+
+            if(iLanguage==109)  $('xbc').setText(tl('WebPtz.Step'));
+            
+            $('xbb').setText(tl('WebPtz.Zoom'));
+            $('xbj').setText(tl('WebPtz.Focus'));
+            $('xgq').setText(tl('WebPtz.Iris'));
+            $('mbcyzd').setText(tl('WebPtz.Preset')+':');
+            $('mbcdjxh').setText(tl('WebPtz.Cruise')+':');
+            $('taba1').setText(tl('WebTitle.ImageColorConfig'));
+            $('xcz').setText(tl('WebBT.SetDefault'));
+            $('xcqsb').setText(tl('WebBT.Reboot'));
+            $('ratio').setText(tl('WebBT.ChangeRatio'));
+            $('taba2').setText(tl('WebTitle.OtherSet'));
+            $('userNameInput').setText(tl('WebInput.UserName'));
+            $('passWordInput').setText(tl('WebInput.Password'));
+            $('loginBT').setText(tl('WebBT.LogIn'));
+            $('PlayAudio').setText(tl('Desktop.PlayMusic'));
+            $('QSC').setText(tl('PlayBack.Close'));
+            
+            $('xp0').title=tl('Desktop.SplitFull');
+            $('xp1').title=tl('Desktop.Split1');
+            $('xp2').title=tl('Desktop.Split4');
+            $('xp3').title=tl('Desktop.Split9');
+            $('xp4').title=tl('Desktop.Split16');
+            $('xp5').title=tl('Desktop.Split25');
+            $('xp6').title=tl('Desktop.Split36');
+            $('startPlayAll').title=tl('WebBT.PlayAll');
+            $('stopPlayAll').title=tl('WebBT.StopPlayAll');
+            $('snap').title=tl('Desktop.Snapshot');
+            $('recordAll').title=tl('WebBT.RecordAll');
+            $('stopRecordAll').title=tl('WebBT.StopRecordAll');
+            $('Audio').title=tl('Desktop.Audio');
+            
+            $('goPreset').title=tl('PtzControl.Goto');
+            $('addPreset').title=tl('PtzControl.AddPreset');
+            $('delPreset').title=tl('PtzControl.DelPreset');
+            $('goCruise').title=tl('PtzControl.Start');
+            $('stopCruise').title=tl('PtzControl.Stop');
+            $('editCruise').title=tl('PtzControl.Edit');
+            
+            $('xtld').title=tl('ConfigEncode.Brightness');
+            $('xtdbd').title=tl('ConfigEncode.Contrast');
+            $('xtbhd').title=tl('ConfigEncode.Saturation');
+            $('xtsd').title=tl('ConfigEncode.Hue');
+            // $('Talk').title=tl('Desktop.StartTalk');
+        }
+    </script>
+
+    <!-- 下拉框 -->
+
+    <script type="text/javascript">
+        function showmu1() {
+            if (gfmu1==0) {	
+                gfmu1=1;
+                $('smu1').style.display="";			
+            }
+            else closemu1();
+        }
+
+        function closemu1(){
+            gfmu1=0;
+            $('smu1').style.display="none";
+        }
+
+        function onmu1(v){
+            $('ps').value=v;
+            closemu1();
+        }
+    </script>
+
+    <!-- 全播放，录像，声音，对讲 -->
+
+    <script type="text/javascript">
+        function startPlayAll() { ocx.PlayAll() }
+
+        function StopPlayAll() { ocx.StopRealPlayAll() }
+
+        function recordAll() { if(ocx.startRecordAll("C:\\record")) {
+            document.querySelector('#stopRecordAll').style.display = 'block'
+            document.querySelector('#recordAll').style.display = 'none'
+        } }
+
+        function stopRecordAll() { if(ocx.stopRecordAll()) {
+            document.querySelector('#stopRecordAll').style.display = 'none'
+            document.querySelector('#recordAll').style.display = 'block'
+        } }
+
+        function openAudio() {
+            if(g_bAudio) {
+                if(ocx.CloseSound(1)) {
+                    document.querySelector('#Audio').innerHTML = ''
+                    g_bAudio=false;  
+                    
+                }        
+            }
+            else {
+                if(ocx.OpenSound(-1)) {
+                    document.querySelector('#Audio').innerHTML = ''
+                    g_bAudio=true; 
+                }    
+            }
+        }
+
+        function Ontalk() {
+            if($('talking').hasClass('noT')) {
+                if(ocx.StartTalk()) {
+                    $('talking').removeClass($('talking').className);
+                    $('talking').addClass('t');
+                    $('talking').title=tl('Desktop.StopTalk');
+                }
+            }
+            else {   
+                if(ocx.StopTalk()) {
+                    $('talking').removeClass($('talking').className);
+                    $('talking').addClass('noT');
+                    $('talking').title=tl('Desktop.StartTalk');
+                }
+            }
+        }
+    </script>
+
+    <!-- 录像，退出,子码流播放... -->
+
+    <script>
+        function subPlay(ob,channel) {
+            if($(ob).hasClass('noSubPlay')) {
+                if(ocx.StartRealPlay(channel,0,1)) {
+                    $(ob).removeClass($(ob).className);
+                    $(ob).addClass('subPlay');
+                    getcolors();
+                }
+            }
+            else {
+                if(ocx.StopPlayReal(channel)) {
+                    $(ob).removeClass($(ob).className);
+                    $(ob).addClass('noSubPlay');
+                }
+            }
+        }
+
+        function record(ob,channel) {
+            if($(ob).hasClass('noRecord')) {
+                if(ocx.StartRecordByChannel(channel)) {
+                    $(ob).removeClass($(ob).className);
+                    $(ob).addClass('record');
+                }
+            }
+            else {
+                if(ocx.StopRecordBychannel(channel)) {
+                    $(ob).removeClass($(ob).className);
+                    $(ob).addClass('noRecord');
+                }
+            }
+        }
+
+        function Logout() {
+            if(ocx.Logout()) {
+                document.querySelector('#m').style.top = '100000rem'
+                $('login').style.display="";
+                $('preSet').value=1;
+                $('cruise').value=1;
+                $('ps').value=5;
+                g_bClose=true;
+                $('langlist').disabled=false;
+            }
+        }
+
+
+        function recordCtrl() { //点击对应窗口录像（暂时没应用）
+            if(!g_bRecord) {
+                if (ocx.StartRecord('C:\\record')) g_bRecord=true;  
+            }
+            else {
+                if(ocx.StopRecord()) g_bRecord=false;
+            }
+        }
+
+        function StopRealPlay() { // 根据当前窗口关闭播放（暂时没应用）
+            if(ocx.StopRealPlay()) {
+                $('stop').removeClass($('stop').className)
+                $('stop').addClass('p7')        
+            }
+        }
+    </script>
+
+    <!-- 事件 -->
+
+    <script language="javascript" for="ocx" event="PlayAudio(bIsPlay)">
+        if (bIsPlay) $('PlayAudio').style.display='';
+        else $('PlayAudio').style.display="none";
+    </script>
+    
+	<script language=JavaScript type=text/JavaScript>
+        var tmpDate = new Date();
+        var year= tmpDate.getFullYear();
+    </script> 
+	
+    <script language="javascript" for="ocx" event="reName(channel)">
+        var ts        = new Array(),
+            t         = new Array(),
+            strsplita = String.fromCharCode(16),
+            strsplitb = String.fromCharCode(9),
+            sc;
+        
+        sc=ocx.GetChannelName();
+
+        if (sc !="") {
+            sc=sc.substr(0, sc.length-1);
+            t=sc.split(strsplita);
+
+            for (var i =0; i<t.length;i++ ) {
+                ts=t[i].split(strsplitb);
+
+            }
+		}
+    </script>
+    
+    <script language="javascript" for="ocx" event="ShowSubQS(bShow1, bShow2, bShow3, bShow4, name4)"> 
+  
+        if(bShow1) g_bSubQS1 = true;
+        else g_bSubQS1 = false;
+        
+        if(bShow2) g_bSubQS2 = true;
+        else g_bSubQS2 = false;
+        
+        if(bShow3) g_bSubQS3 = true;
+        else g_bSubQS3 = false;
+
+        if(bShow4) g_bSubQS4 = true;
+        else g_bSubQS4 = false;
+
+        g_strSubQS4Name = name4;
+    </script>
+
+    <script language="javascript" for="ocx" event="oneSubOpen(channel)">    
+        var tempPlay="c"+(channel).toString();
+
+        if($(tempPlay).hasClass('cl2')) {
+            $(tempPlay).removeClass($(tempPlay).className);
+            $(tempPlay).addClass('cl1');        
+        }
+
+        var tempSubPlay="subPlay"+(channel).toString();
+
+        $(tempSubPlay).removeClass($(tempSubPlay).className);
+        $(tempSubPlay).addClass('subPlay');
+        getcolors(); 
+    </script>
+
+    <script language="javascript" for="ocx" event="ForbitLanguage()"> 
+        $('langlist').disabled=true;
+    </script>
+
+    <script language="javascript" for="ocx" event="SelEnglish()"> 
+       numLanguage=0;
+    </script>
+
+    <script language="javascript" for="ocx" event="StopPosition()"> 
+       $('menu').removeClass($('menu').className);
+       $('menu').addClass('PositionStop');
+    </script>
+
+    <script language="javascript" for="ocx" event="StartPosition()"> 
+       $('menu').removeClass($('menu').className);
+       $('menu').addClass('PositionStart');
+    </script>
+
+    <script language="javascript" for="ocx" event="DigitalStatus(nStatus,channel)"> 
+        if (1==nStatus) {
+            var tempSubPlay="subPlay"+(channel).toString();
+
+            $(tempSubPlay).removeClass($(tempSubPlay).className);
+            $(tempSubPlay).addClass('forbitsubPlay');
+            
+            var tempRecord="re"+(channel).toString();
+
+            $(tempRecord).removeClass($(tempRecord).className);
+            $(tempRecord).addClass("forbitRecord");
+            
+            var tempPlay="c"+(channel).toString();
+
+            $(tempPlay).removeClass($(tempPlay).className);
+            $(tempPlay).addClass("forbitPlay");
+        }
+
+        if (0==nStatus) {
+            var tempSubPlay="subPlay"+(channel).toString();
+
+            $(tempSubPlay).removeClass($(tempSubPlay).className);
+            $(tempSubPlay).addClass('noSubPlay');
+            
+            var tempRecord="re"+(channel).toString();
+
+            $(tempRecord).removeClass($(tempRecord).className);
+            $(tempRecord).addClass("noRecord");
+            
+            var tempPlay="c"+(channel).toString();
+
+            $(tempPlay).removeClass($(tempPlay).className);
+            $(tempPlay).addClass("cl1");
+        }
+
+        if (2==nStatus) {
+            var tempPlay="c"+(channel).toString();
+
+            $(tempPlay).removeClass($(tempPlay).className);
+            $(tempPlay).addClass("cl2");
+        }
+
+        if (3==nStatus) {
+            var tempPlay="subPlay"+(channel).toString();
+
+            $(tempPlay).removeClass($(tempPlay).className);
+            $(tempPlay).addClass("noSubPlay");
+        }
+
+        if (4==nStatus) {
+            var tempPlay="subPlay"+(channel).toString();
+
+            $(tempPlay).removeClass($(tempPlay).className);
+            $(tempPlay).addClass("subPlay");
+            
+        }
+
+        if (5==nStatus) {
+            var tempPlay="re"+(channel).toString();
+
+            $(tempPlay).removeClass($(tempPlay).className);
+            $(tempPlay).addClass("record");
+        }
+
+        if (6==nStatus) {
+            var tempPlay="re"+(channel).toString();
+
+            $(tempPlay).removeClass($(tempPlay).className);
+            $(tempPlay).addClass("noRecord");
+        }
+   
+        getcolors();
+    </script>
+
+    <script language="javascript" for="ocx" event="OneChannelOpen(channel)">//某个通道打开，比如报警
+        // if(channel<g_channelNum-g_digitalChannel)
+        // {
+
+        var tempSubPlay="subPlay"+(channel).toString();
+
+        if($(tempSubPlay).hasClass('subPlay')) {
+            $(tempSubPlay).removeClass($(tempSubPlay).className);
+            $(tempSubPlay).addClass('noSubPlay');        
+        }
+
+        /* } */
+
+        var tempPlay="c"+(channel).toString();
+
+        $(tempPlay).removeClass($(tempPlay).className);
+        $(tempPlay).addClass('cl2');
+
+        getcolors();
+    </script>
+
+    <script language="javascript" for="ocx" event="startPlayExitChannel(channel,bSub)">//开始播放上回退出视频
+        gexiti++;
+        gExitChannel[gexiti]=channel;
+
+        if (bSub==true) gExitSubType[gexiti]=true;
+        else gExitSubType[gexiti]=false;
+
+        getcolors();
+    </script>
+
+    <script language="javascript" for="ocx" event="RButtonDown(flag,x,y)">//右键退出（退出全屏）
+        ocx.Fullscreen(false); 
+    </script>
+
+    <script language="javascript" for="ocx" event="stopPlayOneChannel(lChannel)">//停止一个通道的播放（图标变色）
+        var tempPlay="c"+(lChannel).toString();
+        var tempRecord="re"+(lChannel).toString();
+
+        $(tempPlay).removeClass($(tempPlay).className);
+        $(tempPlay).addClass('cl1');
+        $(tempRecord).removeClass($(tempRecord).className);
+        $(tempRecord).addClass('noRecord');
+
+//             if(lChannel<g_channelNum-g_digitalChannel)
+//             {
+
+        var tempSubPlay="subPlay"+(lChannel).toString();
+        $(tempSubPlay).removeClass($(tempSubPlay).className);
+        $(tempSubPlay).addClass('noSubPlay');  
+/*            }*/
+        getcolors();
+    </script>
+
+    <script language="javascript" for="ocx" event="bRecordAndRealPlay(bRecord, bRealPlay)">//选中一个窗口（翻译当前窗口的录像，和播放开关状态）
+        if(bRealPlay==true) {  }
+    
+        // getcolors(); //获取颜色值
+    </script>
+
+    <script language="javascript" for="ocx" event="AllChannelCtrl( bPlay, bStopPlay, bRecord,bStopRecord)">//全通道录像，播放开关,(子码播放用到，record两个变量)
+        if(bPlay) {
+            if(bRecord) { // 借用于子码流播放
+                for(var j=0;j<g_channelNum;j++) {            
+                    var tempSubPlay="subPlay"+(j).toString();    
+
+                    $(tempSubPlay).removeClass($(tempSubPlay).className);
+                    $(tempSubPlay).addClass('subPlay');
+                }
+            }
+            else {
+            for(var j=0;j<g_channelNum;j++) {
+                    var temp="c"+(j).toString();
+                    $(temp).removeClass($(temp).className);
+                    $(temp).addClass('cl2');
+                }
+            }
+        }
+        else if(bStopPlay) {
+            for(var j=0;j<g_channelNum;j++) {
+                var temp="c"+(j).toString();
+
+                $(temp).removeClass($(temp).className);
+                $(temp).addClass('cl1');
+
+    //             if(j>=g_channelNum-g_digitalChannel)
+    //             continue;
+
+                var tempSubPlay="subPlay"+(j).toString();
+
+                $(tempSubPlay).removeClass($(tempSubPlay).className);
+                $(tempSubPlay).addClass('noSubPlay');
+            }
+        }
+        else if(bRecord) {
+            for(var j=0;j<g_channelNum;j++) {
+                var tempPlay="c"+(j).toString(),
+                    tempsub="subPlay"+(j).toString();
+
+                if($(tempPlay).hasClass('cl2') || (/* j<g_channelNum-g_digitalChannel && */$(tempsub).hasClass('subPlay'))) {
+                    var temp="re"+(j).toString();
+
+                    $(temp).removeClass($(temp).className);
+                    $(temp).addClass('record');            
+                }
+            }
+        }
+        else  if(bStopRecord) {
+            for(var j=0;j<g_channelNum;j++) {
+                var temp="re"+(j).toString();
+
+                $(temp).removeClass($(temp).className);
+                $(temp).addClass('noRecord');
+            }
+        }
+
+        getcolors();
+    </script>
+
+    <script language="javascript" for="ocx" event="bSound(bs)">//选择窗口是否有播放声音
+        getcolors(); //获取颜色值
+
+        if(bs) {
+            g_bAudio=true;                        
+            if($('Audio').hasClass('p102')) {
+                $('Audio').removeClass($('Audio').className)
+                $('Audio').addClass('p10')
+            }                        
+        }
+        else {
+            g_bAudio=false;
+            if($('Audio').hasClass('p10')) {
+                $('Audio').removeClass($('Audio').className)
+                $('Audio').addClass('p102')
+            }                        
+        }
+    </script>
+
+    <script language="javascript" for="ocx" event="ReBoot()">
+        $('talking').removeClass($('talking').className);
+        $('talking').addClass('noT');
+        $('talking').title=tl('Desktop.StartTalk');//关闭对讲
+            
+        for(var j=0;j<g_channelNum;j++) { //关闭录像
+            var temp="re"+(j).toString();
+
+            $(temp).removeClass($(temp).className);
+            $(temp).addClass('noRecord');
+        }
+    </script>
+
+    <script language="javascript" for="ocx" event="AutoPlayAll(bPlay)">
+        if(bPlay)  gAutoPlayAll=true;
+        else gAutoPlayAll=false;
+    </script>
+    
+    <script type="text/javascript" for="ocx" event="SpecialEvent(nType,nNumber,nCheck)">
+        if(nType==1) g_Radio=1.78;
+    </script>
+	
+	<!-- 跳到登陆界面 -->
+	<script language="javascript" for="ocx" event="GotoLogin(nFlag)">
+		location="index.htm";
+	</script>
+	
+    <!-- 加载效果 -->
+
+    <script>
+        window.addEvent('domready',function(){
+            if (g_whitePage) return;
+
+            //拖动
+
+            var container = $('mb'),
+                drop = $('drb'),
+                mba=$('mba'),
+                mbb=$('mbb'),
+                mbc=$('mbc'),
+                dropFx = drop.effect('opacity', {wait: false}), // wait is needed so that to toggle the effect,
+                bedra= $('dra'),
+                bedrc= $('drc');
+
+            bedra.addEvent('mousedown', function(e) {
+                e = new Event(e).stop();
+                    
+                var clone = this.clone()
+                    .setStyles(this.getCoordinates()) // this returns an object with left/top/bottom/right, so its perfect
+                    .setStyles({'opacity': 0.7, 'position': 'absolute'})
+                    .addEvent('emptydrop', function() {this.remove();drop.removeEvents();})						
+                    .inject(document.body);	
+                drop.addEvents({
+                    'drop': function() {
+                        drop.removeEvents();
+                        clone.remove();							
+                        dropFx.start('1');	
+                                                
+                        if (mbc.getStyle('left') !='0px') {
+                            mbc.setStyle('left','0');
+                            mbc.injectBefore(mba);
+                            mbb.injectBefore(mba);
+                        }
+                        else {
+                            mbc.setStyle('left','120');							
+                            mba.injectBefore(mbc);
+                            mbb.injectBefore(mbc);
+                        }
+                    },
+                    'over': function() { dropFx.start('0.7') },
+                    'leave': function() { dropFx.start('1') }						
+                });
+
+                var drag = clone.makeDraggable({
+                    'container':container,
+                    'droppables': [drop]
+                }); // this returns the dragged element
+
+                drag.start(e); // start the event manual	
+            });
+
+            bedrc.addEvent('mousedown', function(e) {
+                e = new Event(e).stop();
+                    
+                var clone = this.clone()
+                    .setStyles(this.getCoordinates()) // this returns an object with left/top/bottom/right, so its perfect
+                    .setStyles({'opacity': 0.7, 'position': 'absolute'})
+                    .addEvent('emptydrop', function() {this.remove();drop.removeEvents();})						
+                    .inject(document.body);	
+
+                drop.addEvents({
+                    'drop': function() {
+                        drop.removeEvents();
+                        clone.remove();							
+                        dropFx.start('1');											
+                        if (mbc.getStyle('left') !='0px') {
+                            mbc.setStyle('left','0');
+                            mbc.injectBefore(mba);
+                            mbb.injectBefore(mba);
+                        }
+                        else {
+                            mbc.setStyle('left','120');							
+                            mba.injectBefore(mbc);
+                            mbb.injectBefore(mbc);
+                        }
+                    },
+                    'over': function() { dropFx.start('0.7') },
+                    'leave': function() { dropFx.start('1') }						
+                });
+
+                var drag = clone.makeDraggable({
+                    'container':container,
+                    'droppables': [drop]
+                }); // this returns the dragged element
+
+                drag.start(e); // start the event manual	
+            });
+
+            //颜色滑块
+
+            gslda = new Slider($('saa'), $('ska'), {
+                steps:128,
+                onChange:function(step){setcolorsv(1,step);setcolors();}
+            });
+
+            gsldb = new Slider($('sab'), $('skb'), {
+                steps:128,
+                onChange:function(step){setcolorsv(2,step);setcolors();}
+            });
+            
+            gsldc = new Slider($('sac'), $('skc'), {
+                steps:128,
+                onChange:function(step){setcolorsv(3,step);setcolors();}
+            });
+            
+            gsldd = new Slider($('sad'), $('skd'), {
+                steps:128,
+                onChange:function(step){setcolorsv(4,step);setcolors();}
+            });
+            //********************************
+
+            var taba1=$('taba1'),
+                taba2=$('taba2');
+
+            taba1.addEvent('click', function(e) {
+                new Event(e).stop();
+                if (this.hasClass('t3')) {
+                    this.removeClass(this.className);
+                    this.addClass('t1');			
+                    taba2.removeClass(taba2.className);
+                    taba2.addClass('t2');
+
+                    $('yt3t1').style.display="";			
+                    $('yt3t2').style.display="none";			
+                }
+            });
+            
+            taba2.addEvent('click', function(e) {
+                new Event(e).stop();
+                if (this.hasClass('t2')) {
+                    taba1.removeClass(taba2.className);
+                    taba1.addClass('t3');			
+                    this.removeClass(this.className);
+                    this.addClass('t4');
+                    $('yt3t1').style.display="none";			
+                    $('yt3t2').style.display="block";			
+                }
+            });
+
+            //主菜单
+
+            var kwicks = $$('#kwick .kwick'),
+                fx = new Fx.Elements(kwicks, {wait: false, duration: 300, transition:Fx.Transitions.Back.easeOut});
+            
+            kwicks.each(function(kwick, i) {
+                kwick.addEvent('mouseenter', function(e) {
+                    var obj = {};
+
+                    obj[i] = { 'width': [kwick.getStyle('width').toInt(), 155] };
+                    kwicks.each(function(other, j){
+                        if (other != kwick){
+                            var w = other.getStyle('width').toInt();
+
+                            if (w != 80) obj[j] = {'width': [w,110]};
+                        }
+                    });
+
+                    fx.start(obj);
+                });
+            });
+            
+            $('kwick').addEvent('mouseleave', function(e){
+                var obj = {};
+
+                kwicks.each(function(other, j){ obj[j] = {'width': [other.getStyle('width').toInt(), 120]} });
+                fx.start(obj);
+            });
+
+            inilanguage();
+            getsetting();
+        });
+    </script>
+
+    <script type="text/javascript">
+        function DetectActiveX() {
+            try {   
+            var comActiveX = new ActiveXObject("WEB.WebCtrl.1");      
+            comActiveX=null;           
+            }
+            catch(e) { return false }
+
+            return true;
+        }
+
+        function Download() { window.open(LoardAddress) }
+
+        var g_whitePage=false,
+            g_bDownLoadButton=false;
+
+        if(false==DetectActiveX()) {
+            if (DownLoadAddr) g_bDownLoadButton=true;
+            if (LoardAddress) g_whitePage=true;
+        }	    
+    </script>
+
+    <script type="text/javascript">
+        function ChangeLang() {
+            var nSel=$('langlist').selectedIndex,
+                cLanguage;
+
+            switch(nSel) {
+                case 0:
+                        cLanguage="English";
+                        break;
+                case 1:
+                        cLanguage="Russian";
+                        break;
+                default:
+                        cLanguage="English";
+                        break;      
+            }
+
+        ocx.SetSpecialParamEx2(2,cLanguage,0,0);
+        inilanguage();
+        }
+
+        function Close() { g_bClose=true }
+
+        function position_fixed(el, eltop, elleft){
+            // check is IE6
+            if( !window.XMLHttpRequest ){
+                el.style.position = "absolute";
+                window.attachEvent('onscroll', function(){
+                    //el.style.top = ( document.documentElement.scrollTop + eltop )+"px";
+                });
+            }
+            else el.style.position = "fixed";
+        }
+    </script>
+
+</head>
+<body>
+    <div id="login" class="section" style="display:none;">
+        <div class="login-conteiner">
+            <div style="position: absolute; top: -2000px; width: 0px;">
+                <a style="background: url(play.gif)"></a>
+                <a style="background: url(record.gif)"></a>
+                <a style="background: url(subPlay.gif)"></a>
+                <a style="background: url(Talk.gif)"></a>
+            </div>
+            <div class="logo-img">
+                <img src="logo.png" alt="MegaCam">
+            </div>
+            <div id='DownLoadPlug' onclick="DownLoadLo();"><div></div></div>
+            <div id='lang'>
+                <label for="langlist">Language:</label>
+                <select id="langlist" name="langlist" onchange="ChangeLang()"> 
+                    <option>English</option>
+                    <option>Русский</option>
+                </select>
+            </div>
+            <div>
+                <label id='userNameInput' for="username"></label>
+                <input id="username" name="username" type='text' onkeydown="javascript:if (event.keyCode==13) event.keyCode=9;" />
+            </div>
+            <div>
+                <label id='passWordInput' for="password"></label>
+                <input id="password" name="password" type="password" onkeydown="javascript:if (event.keyCode==13) ld();" />
+                <div id='reminder' onclick="reminder();"></div>
+            </div>
+            <div>
+                <button id='loginBT' onclick="ld()"></button>
+            </div>
+        </div>
+    </div>
+    <div id="downLoad" style="display: none">
+        <div id="dlText"></div>
+        <button id="dlbutton" onclick="Download();"></button>
+    </div>
+    
+    <script type="text/javascript">
+        if(!g_whitePage) {
+            if(g_bDownLoadButton) {
+                $('DownLoadPlug').style.display='';	
+                var userla=navigator.browserLanguage;
+
+                if(userla=="zh-cn") $('DownLoadPlug').setText("下载控件"); 
+                else $('DownLoadPlug').setText("DownLoad");
+            }
+            else $('DownLoadPlug').style.display="none";
+
+            $('login').style.display='';
+        }
+        else {   
+            var userla=navigator.browserLanguage;
+            if(userla=="zh-cn") {
+                $('dlText').setText("请安装随机光盘中的IE控件或者从网络下载IE控件");
+                $('dlbutton').setText("下载");
+            }
+            else {
+                $('dlText').setText("Please install IE ActiveX: IE_Plugins.exe from CD or download from internet");
+                $('dlbutton').setText("Download");					
+            }
+
+            $('downLoad').style.display='';        
+        }
+    </script>
+
+    <div id="m">
+        <div id="ma"> <!-- Main screen header -->
+            <img class="logo-img" src="logo-mini.png" alt="MegaCam">
+            <div class="current-time">
+                <span class="icon"></span>
+                <div class="time"></div>
+            </div>
+            <div id="mac"></div>
+            <div id="mad"></div>
+            <div id="kwick">
+                <ul class="kwicks">
+                    <li id='mthf' class="b icon" onclick="ocx.ShowPlayBack()"></li>
+                    <li id='mtrz' class="c icon" onclick="ocx.ShowLog()"></li>
+                    <li id='mtsbpz' class="a icon" onclick="ocx.ShowDeviceConfig()"></li>
+                    <li id='mtkhdpz' class="d icon" onclick="ocx.ShowClientConfig()"></li>
+                    <li id='mttc' class="e icon" onclick="Logout()"></li>
+                </ul>
+            </div>
+        </div>
+        <div id="mb">
+            <div id="mba">
+                <div class="mpad">
+                    <div id='dra'></div>
+                    <div id='dcl'>
+                        <div id='mbal'></div>
+                    </div>
+                </div>
+            </div>
+            <div id="mbb">
+                <div id="drb"></div>
+                <div id='pla'>
+                <script>
+                    if(g_whitePage) {  }
+                    else {
+                        var cLanguage;
+                        
+                        switch(iLanguage) {
+                            case 100:
+                                cLanguage="English";
+                                numLanguage=0;
+                                break;
+                            case 101:
+                                cLanguage="Russian";
+                                numLanguage=6;
+                                break;
+                            default:
+                                cLanguage="English";
+                                numLanguage=0;
+                                break;
+                        }
+			
+                        document.write("<div><a style='background:url(yta11.jpg)'></a><a style='background: url(yt-1.gif)'></a><a style='background: url(yt+1.gif)'></a><a style='background: url(11.jpg)'></a><a style='background: url(91.jpg)'></a><a style='background: url(41.jpg)'></a><a style='background: url(stopRecordAll1.jpg)'></a> <a style='background: url(m_img21.jpg)'></a><a style='background: url(m_img41.jpg)'>      </a><a style='background: url(audio.jpg)'></a><a style='background: url(yt11.jpg)'></a>        <a style='background: url(yt21.jpg)'></a><a style='background: url(yt31.jpg)'></a>        <a style='background: url(yt41.jpg)'></a><a style='background: url(yt51.jpg)'></a>        <a style='background: url(yt61.jpg)'></a><a style='background: url(yt71.jpg)'></a>        <a style='background: url(yt81.jpg)'></a><a style='background: url(yt91.jpg)'></a>        <a style='background: url(yt+1.png)'></a><a style='background: url(yt-1.png)'></a>        <a style='background: url(goPreSet1.jpg)'></a><a style='background: url(addPreSet1.jpg)'>        </a><a style='background: url(editCruise1.jpg)'></a><a style='background: url(delPreSet1.jpg)'>        </a><a style='background: url(goCruise1.jpg)'></a><a style='background: url(stopCruise1.jpg)'>        </a><a style='background: url(t1t.jpg)'></a><a style='background: url(yy11.jpg)'></a>        <a style='background: url(full1.jpg)'></a><a style='background: url(sar.png)'></a>        <a style='background: url(sar1.png)'></a><a style='background: url(sal.png)'></a>        <a style='background: url(sal1.png)'></a><a style='background: url(stopAll1.jpg)'></a>        <a style='background: url(startAll1.jpg)'></a><a style='background: url(snap1.jpg)'></a>        <a style='background: url(recordAll1.jpg)'></a><a style='background: url(stopRecordAll.jpg)'></a><a style='background: url(361.jpg)'></a><a style='background: url(251.jpg)'></a><a style='background: url(161.jpg)'></a>    </div>");			
+                        document.write("<object id='ocx' classid='CLSID:FD3BEB0C-AB43-4253-9146-C371D48FBE0D' codebase='"+cabAddress+"'></object>");
+                    }
+                </script>
+            </div>
+            </div>
+            <div id="mbc">
+                <div class="mbc-trigger icon"><span></span></div>
+                <div id='drc'></div>
+                <div id='yt'>
+                    <div><a class="y1 icon" href="javascript:;" onmousedown="ocx.PTZCtrlStart(-1,4,$('ps').value)" onmouseup="ocx.PTZCtrlStop(-1,4,$('ps').value)" onmouseout="ocx.PTZCtrlStop(-1,4,$('ps').value)"></a></div>
+                    <div><a class="y2 icon" href="javascript:;" onmousedown="ocx.PTZCtrlStart(-1,0,$('ps').value)" onmouseup="ocx.PTZCtrlStop(-1,0,$('ps').value)" onmouseout="ocx.PTZCtrlStop(-1,0,$('ps').value)"></a></div>
+                    <div><a class="y3 icon" href="javascript:;" onmousedown="ocx.PTZCtrlStart(-1,6,$('ps').value)" onmouseup="ocx.PTZCtrlStop(-1,6,$('ps').value)" onmouseout="ocx.PTZCtrlStop(-1,6,$('ps').value)"></a></div>
+                    <div><a class="y4 icon" href="javascript:;" onmousedown="ocx.PTZCtrlStart(-1,2,$('ps').value)" onmouseup="ocx.PTZCtrlStop(-1,2,$('ps').value)" onmouseout="ocx.PTZCtrlStop(-1,2,$('ps').value)"></a></div>
+                    <div><a class="y5 icon" href="javascript:;" onclick="ocx.OnBntEntermenu();"></a></div>
+                    <div><a class="y6 icon" href="javascript:;" onmousedown="ocx.PTZCtrlStart(-1,3,$('ps').value)" onmouseup="ocx.PTZCtrlStop(-1,3,$('ps').value)" onmouseout="ocx.PTZCtrlStop(-1,3,$('ps').value)"></a></div>
+                    <div><a class="y7 icon" href="javascript:;" onmousedown="ocx.PTZCtrlStart(-1,5,$('ps').value)" onmouseup="ocx.PTZCtrlStop(-1,5,$('ps').value)" onmouseout="ocx.PTZCtrlStop(-1,5,$('ps').value)"></a></div>
+                    <div><a class="y8 icon" href="javascript:;" onmousedown="ocx.PTZCtrlStart(-1,1,$('ps').value)" onmouseup="ocx.PTZCtrlStop(-1,1,$('ps').value)" onmouseout="ocx.PTZCtrlStop(-1,1,$('ps').value)"></a></div>
+                    <div><a class="y9 icon" href="javascript:;" onmousedown="ocx.PTZCtrlStart(-1,7,$('ps').value)" onmouseup="ocx.PTZCtrlStop(-1,7,$('ps').value)" onmouseout="ocx.PTZCtrlStop(-1,7,$('ps').value)"></a></div>
+                </div>
+                <div><a  id="menu" class="y10" href="javascript:;" onclick="ocx.OnBntStart3DPos();"></a></div>
+                <div class="mbc-settings">
+                    <span id='xbc' class="divt">步长(1-8):</span>
+                    <div>
+                        <input class="inputyt" type="text" id="ps" value="5" maxlength="1" onkeyup="value=value.replace(/[^\d]/g,''); if (value > 8) value = 8;if ((value.length!=0)&&value<1) value=1;" onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,''))">
+                        <a href="javascript:;" class="yta1 icon" onclick="showmu1()"></a>
+                    </div>
+                </div>
+                <div id="smu1" style="display: none">
+                    <ul>
+                        <li><a href='javascript:;' onclick='onmu1(1)'>1</a></li>
+                        <li><a href='javascript:;' onclick='onmu1(2)'>2</a></li>
+                        <li><a href='javascript:;' onclick='onmu1(3)'>3</a></li>
+                        <li><a href='javascript:;' onclick='onmu1(4)'>4</a></li>
+                        <li><a href='javascript:;' onclick='onmu1(5)'>5</a></li>
+                        <li><a href='javascript:;' onclick='onmu1(6)'>6</a></li>
+                        <li><a href='javascript:;' onclick='onmu1(7)'>7</a></li>
+                        <li><a href='javascript:;' onclick='onmu1(8)'>8</a></li>
+                    </ul>
+                </div>
+                <div id='yt1'>
+                    <div>
+                        <a class="y1 icon" href="javascript:;" onmousedown="ocx.PTZCtrlStart(-1,9,$('ps').value)" onmouseup="ocx.PTZCtrlStop(-1,9,$('ps').value)"></a>
+                        <span id='xbb'>变倍</span>
+                        <a class="y2 icon" href="javascript:;" onmousedown="ocx.PTZCtrlStart(-1,8,$('ps').value)" onmouseup="ocx.PTZCtrlStop(-1,8,$('ps').value)"></a>
+                    </div>
+                    <div>
+                        <a class="y1 icon" href="javascript:;" onmousedown="ocx.PTZCtrlStart(-1,11,$('ps').value)" onmouseup="ocx.PTZCtrlStop(-1,11,$('ps').value)"></a>
+                        <span id='xbj'>变焦</span>
+                        <a class="y2 icon" href="javascript:;" onmousedown="ocx.PTZCtrlStart(-1,10,$('ps').value)" onmouseup="ocx.PTZCtrlStop(-1,10,$('ps').value)"></a>
+                    </div>
+                    <div>
+                        <a class="y1 icon" href="javascript:;" onmousedown="ocx.PTZCtrlStart(-1,12,$('ps').value)" onmouseup="ocx.PTZCtrlStop(-1,12,$('ps').value)"></a>
+                        <span id='xgq'>光圈</span>
+                        <a class="y2 icon" href="javascript:;" onmousedown="ocx.PTZCtrlStart(-1,13,$('ps').value)" onmouseup="ocx.PTZCtrlStop(-1,13,$('ps').value)"></a>
+                    </div>
+                </div>
+                <div id='yt2'>
+                    <div>
+                        <!-- 预置点处理 -->
+                        <div id="ytPoint">
+                            <span id='mbcyzd'>预置点：</span>
+                            <div>
+                                    <input id="preSet" value="1" maxlength="3" onkeyup="value=value.replace(/[^\d]/g,''); if (value > 255) value = 255;if ((value.length!=0)&&value<1) value=1;"/>
+                                <button id="goPreset" class="icon" onclick="ocx.PTZCtrlGotoPreset(-1,$('preSet').value)"></button>
+                                <button id="addPreset" class="icon" onclick="ocx.PTZCtrlSetPreset(-1,$('preSet').value,true)"></button>
+                                <button id="delPreset" class="icon" onclick="ocx.PTZCtrlSetPreset(-1,$('preSet').value,false)"></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <!-- 轮询处理 -->
+                        <div id="ytCruise">
+                            <span id='mbcdjxh'>点间巡航：</span>
+                            <div>
+                                    <input id="cruise" value="1" maxlength="3" onkeyup="value=value.replace(/[^\d]/g,''); if (value > 255) value = 255;"/>
+                                <button id="goCruise" class="icon" onclick="ocx.PTZCtrlTour(-1,$('cruise').value,true)"></button>
+                                <button id="stopCruise" class="icon" href="javascript:;" onclick="ocx.PTZCtrlTour(-1,$('cruise').value,false)"></button>
+                                <button id="editCruise" class="icon" href="javascript:;" onclick="ocx.PTZEditTure($('cruise').value)"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id='plc'>
+                    <!--	<div id='pbh' style="background:url(plcb.jpg);width:580px;height:33px;position:absolute;"></div>-->
+                    <div id='pb'>
+                        <div id='pc'>
+                            <a id='xp0' class="p0 icon" href="javascript:;" onclick="ocx.Fullscreen(true)"></a>
+                            <!--<ul id='cl'></ul>-->
+                            <a id='xp1' style="display: none" class="p1 icon" href="javascript:;" onclick="ocx.ChangeShowWndNum(1,true,0,0)"></a>
+                            <a id='xp2' style="display: none" class="p2 icon" href="javascript:;" onclick="ocx.ChangeShowWndNum(4,true,0,0)"></a>
+                            <a id='xp3' style="display: none" class="p3 icon" href="javascript:;" onclick="ocx.ChangeShowWndNum(9,true,0,0)"></a>
+                            <a id='xp4' style="display: none" class="p4" href="javascript:;" onclick="ocx.ChangeShowWndNum(16,true,0,0)">16</a>
+                            <a id='xp5' style="display: none" class="p5" href="javascript:;" onclick="ocx.ChangeShowWndNum(25,true,0,0)">25</a>
+                            <a id='xp6' style="display: none" class="p6" href="javascript:;" onclick="ocx.ChangeShowWndNum(36,true,0,0)">36</a>
+                            <a id='xp7' style="display: none" class="p11" href="javascript:;" onclick="ocx.ChangeShowWndNum(64,true,0,0)">64</a>
+                            <a id='startPlayAll' style="display: none" class="p7 icon" href="javascript:;" onclick="startPlayAll()"></a>
+                            <a id='stopPlayAll' style="display: none" class="p72 icon" href="javascript:;" onclick="StopPlayAll()"></a>
+                            <a title='snap' id='snap' class="p8 icon" href="javascript:;" onclick='ocx.BMPCapturePicture("C:\\BMP")'></a>
+                            <a id='recordAll' style="display: none" class="p9 icon" href="javascript:;" onclick="recordAll()"></a>
+                            <a id='stopRecordAll' style="display: none" class="p92 icon" href="javascript:;" onclick="stopRecordAll()" style="display: none"></a>
+                            <a id='Audio' style="display: none" class="p102 icon" href="javascript:;" onclick="openAudio()"></a>
+                        </div>
+                    </div>
+                </div>
+                <div id='taba'>
+                    <button id='taba1' class="t1" href="javascript:;">图像设置</button>
+                    <button id='taba2' class="t2" href="javascript:;">其他设置</button>
+                </div>
+                <div class="mpad2" style="float: left;">
+                    <!--<div id='yt3'>-->
+                    <div id='yt3'>
+                        <div id='yt3t1'>
+                            <div id='yt3t1a'>
+                                <div>
+                                    <div id='xtld' class="icon" title='亮度'></div>
+                                    <a class="sal icon" href="javascript:;" onclick="gslda.set(gca-1)"></a>
+                                    <div id='saa' class="sax"><div id='ska' class="skx"></div></div>
+                                    <a class="sar icon" href="javascript:;" onclick="gslda.set(gca+1)"></a>
+                                </div>
+                                <div>
+                                    <div id='xtdbd' class="icon" title='对比度'></div>
+                                    <a class="sal icon" href="javascript:;" onclick="gsldb.set(gcb-1)"></a>
+                                    <div id='sab' class="sax"><div id='skb' class="skx"></div></div>
+                                    <a class="sar icon" href="javascript:;" onclick="gsldb.set(gcb+1)"></a>
+                                </div>
+                                <div>
+                                    <div id='xtbhd' class="icon" title='饱和度'></div>
+                                    <a class="sal icon" href="javascript:;" onclick="gsldc.set(gcc-1)"></a>
+                                    <div id='sac' class="sax"><div id='skc' class="skx"></div></div>
+                                    <a class="sar icon" href="javascript:;" onclick="gsldc.set(gcc+1)"></a>
+                                </div>
+                                <div>
+                                    <div id='xtsd' class="icon" title='色度'></div>
+                                    <a class="sal icon" href="javascript:;" onclick="gsldd.set(gcd-1)"></a>
+                                    <div id='sad' class="sax"><div id='skd' class="skx"></div></div>
+                                    <a class="sar icon" href="javascript:;" onclick="gsldd.set(gcd+1)"></a>
+                                </div>
+                            </div>
+                            <button id='DVRcolor' class="cbt" href="javascript:;" onclick="ocx.EditDVRColor(-1);" title=""></button>
+                            <button id='xcz' class="cbt" href="javascript:;" onclick="txreset(64);">重置</button>
+                        </div>
+                        <div id='yt3t2'>
+                            <button id='xcqsb' class="cbt" href="javascript:;" onclick="ocx.RebootServer();" title="">重启设备</button>
+                            <button id='PlayAudio' class="cbt" href="javascript:;" onclick="ocx.PlayAudio(-1);" title=""></button>
+                            <button id='ratio' style="display: none" class="cbt" href="javascript:;" onclick="ChangeRadio();" title=""></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        <div id="QS">
+            <div id="QQ" ></div>
+            <a href="javascript:Close()" id="QSC"></a>
+        </div>
+        <div id="mc">CopyRight<script> document.write(year);</script>,All Rights Reserved</div>
+    </div>
+    <script>
+        if (!ocx.PTZCtrlStart) {
+            document.querySelector('#yt').style.display = 'none'
+            document.querySelector('.mbc-settings').style.display = 'none'
+            document.querySelector('#yt1').style.display = 'none'
+            document.querySelector('#yt2').style.display = 'none'
+        }
+    </script>
+    <script>
+        if (Lockr && Lockr.get('option')) {
+            var val   = Lockr.get('option'),
+                btn   = document.querySelector('.mbc-trigger').querySelector('span'),
+                cont  = document.querySelector('.mbc-trigger').parentNode,
+                cont2 = document.querySelector('#mbb');
+
+            if (val == 'on') {
+                cont.style.right = '0rem'
+                cont2.style.right = '20rem'
+                btn.style.transform = 'rotate(180deg)'
+            } else {
+                cont.style.right = '-19rem'
+                cont2.style.right = '1rem'
+                btn.style.transform = 'rotate(0deg)'
+            }
+        }
+    </script>
+    <script>
+        document.querySelector('.mbc-trigger').onclick = function () {
+            var cont  = this.parentNode,
+                cont2 = document.querySelector('#mbb'),
+                span  = this.querySelector('span');
+            
+            if (cont2.style.right == '20rem') {
+                cont.style.right = '-19rem'
+                cont2.style.right = '1rem'
+                span.style.transform = 'rotate(0deg)'
+                if (Lockr) Lockr.set('option', 'off')
+            } else {
+                cont.style.right = '0rem'
+                cont2.style.right = '20rem'
+                span.style.transform = 'rotate(180deg)'
+                if (Lockr) Lockr.set('option', 'on')
+            }
+        }
+    </script>
+</body>
+</html>
